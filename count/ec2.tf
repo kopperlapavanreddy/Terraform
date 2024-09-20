@@ -1,11 +1,19 @@
 resource "aws_instance" "terraform" {
+  count                  = length(var.instance_names)
   ami                    = "ami-09c813fb71547fc4f"
   instance_type          = "t3.micro"
   vpc_security_group_ids = [aws_security_group.allow_ssh_terraform.id]
 
-  tags = {
-    Name = "pavan-terraform"
-  }
+  # tags = {
+  #   Name = var.instance_names[count.index]
+  # }
+
+  tags = merge(
+    var.comman_tags,
+    {
+      Name = var.instance_names[count.index]
+    }
+  )
 }
 
 resource "aws_security_group" "allow_ssh_terraform" {
@@ -28,7 +36,10 @@ resource "aws_security_group" "allow_ssh_terraform" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name = "allow-sshh"
-  }
+  tags = merge(
+    var.comman_tags,
+    {
+      Name = "allow-sshh"
+    }
+  )
 }
